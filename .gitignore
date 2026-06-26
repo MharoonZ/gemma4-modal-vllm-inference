@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+modal_*.log
+modal_*.pid
+micro_ui_server.pid

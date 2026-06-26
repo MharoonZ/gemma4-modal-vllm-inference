@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gemma 4 Modal Micro UI</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #5c6774;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --danger: #b42318;
+      --warning: #9a6700;
+      --ok: #067647;
+      --shadow: 0 18px 45px rgba(23, 32, 42, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font: 15px/1.45 "Segoe UI", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    main {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 24px 0;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .composer,
+    .side {
+      padding: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 650;
+    }
+
+    .status {
+      min-width: 116px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      background: #fbfcfe;
+    }
+
+    .status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #94a3b8;
+    }
+
+    .status.ready::before {
+      background: var(--ok);
+    }
+
+    .status.busy::before {
+      background: var(--warning);
+    }
+
+    .status.error::before {
+      background: var(--danger);
+    }
+
+    label {
+      display: block;
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      letter-spacing: 0;
+      outline: none;
+    }
+
+    input,
+    select {
+      height: 42px;
+      padding: 0 12px;
+    }
+
+    textarea {
+      min-height: 168px;
+      max-height: 45vh;
+      resize: vertical;
+      padding: 12px;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .settings {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      height: 42px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 0 16px;
+      font: inherit;
+      font-weight: 650;
+      letter-spacing: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+
+    .secondary {
+      background: #fff;
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .primary:hover:not(:disabled) {
+      background: var(--accent-strong);
+    }
+
+    .result {
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .output {
+      min-height: 154px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+      background: #fbfcfe;
+    }
+
+    .error {
+      display: none;
+      margin-top: 12px;
+      border: 1px solid #f0b8b2;
+      color: var(--danger);
+      background: #fff7f6;
+      border-radius: 6px;
+      padding: 10px 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      min-height: 72px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 18px;
+      line-height: 1.15;
+    }
+
+    .side h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .history {
+      display: grid;
+      gap: 8px;
+      max-height: 484px;
+      overflow: auto;
+    }
+
+    .entry {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      background: #fbfcfe;
+    }
+
+    .entry-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .entry strong {
+      display: block;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        width: min(100vw - 20px, 680px);
+        padding: 10px 0;
+      }
+
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .settings,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar,
+      .actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .status,
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="app-shell">
+      <section class="panel composer" aria-labelledby="app-title">
+        <div class="topbar">
+          <h1 id="app-title">Gemma 4 Modal Micro UI</h1>
+          <div class="status" id="status">Idle</div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label for="endpoint">Modal vLLM endpoint</label>
+            <input id="endpoint" type="url" placeholder="https://...modal.run">
+          </div>
+
+          <div>
+            <label for="prompt">Prompt</label>
+            <textarea id="prompt">Hello World</textarea>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <label for="model">Model</label>
+            <input id="model" value="google/gemma-4-E4B-it">
+          </div>
+          <div>
+            <label for="maxTokens">Max tokens</label>
+            <input id="maxTokens" type="number" min="1" max="1024" value="128">
+          </div>
+          <div>
+            <label for="timeout">Timeout seconds</label>
+            <input id="timeout" type="number" min="10" max="1200" value="420">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="secondary" id="checkHealth" type="button">Check Health</button>
+          <button class="primary" id="send" type="button">Send</button>
+        </div>
+
+        <div class="result">
+          <label for="output">Response</label>
+          <div class="output" id="output" role="status" aria-live="polite"></div>
+          <div class="error" id="error" role="alert"></div>
+        </div>
+
+        <div class="metrics" aria-label="latency metrics">
+          <div class="metric">
+            <span>First-run latency</span>
+            <strong id="coldLatency">-</strong>
+          </div>
+          <div class="metric">
+            <span>Warm latency</span>
+            <strong id="warmLatency">-</strong>
+          </div>
+          <div class="metric">
+            <span>Health wait</span>
+            <strong id="healthLatency">-</strong>
+          </div>
+          <div class="metric">
+            <span>Token usage</span>
+            <strong id="usage">-</strong>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel side">
+        <h2>Latency Log</h2>
+        <div class="history" id="history"></div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const DEFAULT_ENDPOINT = "https://foodqer--gemma4-vllm-micro-ui-serve-dev.modal.run";
+
+    const state = {
+      hasCompletedRequest: false,
+      history: JSON.parse(localStorage.getItem("gemma4MicroUiHistory") || "[]"),
+    };
+
+    const els = {
+      endpoint: document.getElementById("endpoint"),
+      prompt: document.getElementById("prompt"),
+      model: document.getElementById("model"),
+      maxTokens: document.getElementById("maxTokens"),
+      timeout: document.getElementById("timeout"),
+      send: document.getElementById("send"),
+      checkHealth: document.getElementById("checkHealth"),
+      status: document.getElementById("status"),
+      output: document.getElementById("output"),
+      error: document.getElementById("error"),
+      coldLatency: document.getElementById("coldLatency"),
+      warmLatency: document.getElementById("warmLatency"),
+      healthLatency: document.getElementById("healthLatency"),
+      usage: document.getElementById("usage"),
+      history: document.getElementById("history"),
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const endpointFromQuery = urlParams.get("endpoint");
+    els.endpoint.value = endpointFromQuery || localStorage.getItem("gemma4Endpoint") || DEFAULT_ENDPOINT;
+
+    renderHistory();
+
+    els.endpoint.addEventListener("change", () => {
+      localStorage.setItem("gemma4Endpoint", cleanEndpoint(els.endpoint.value));
+      els.endpoint.value = cleanEndpoint(els.endpoint.value);
+    });
+    els.send.addEventListener("click", sendPrompt);
+    els.checkHealth.addEventListener("click", checkHealthOnly);
+
+    function cleanEndpoint(value) {
+      return value.trim().replace(/\/+$/, "");
+    }
+
+    function timeoutMs() {
+      const seconds = Number.parseInt(els.timeout.value, 10);
+      return Math.max(10, Number.isFinite(seconds) ? seconds : 420) * 1000;
+    }
+
+    function setBusy(isBusy, label = "Loading") {
+      els.send.disabled = isBusy;
+      els.checkHealth.disabled = isBusy;
+      els.status.textContent = isBusy ? label : "Ready";
+      els.status.className = `status ${isBusy ? "busy" : "ready"}`;
+    }
+
+    function showError(message) {
+      els.error.textContent = message;
+      els.error.classList.add("show");
+      els.status.textContent = "Error";
+      els.status.className = "status error";
+    }
+
+    function clearError() {
+      els.error.textContent = "";
+      els.error.classList.remove("show");
+    }
+
+    function formatMs(ms) {
+      if (!Number.isFinite(ms)) return "-";
+      if (ms < 1000) return `${Math.round(ms)} ms`;
+      return `${(ms / 1000).toFixed(2)} s`;
+    }
+
+    function validateEndpoint() {
+      const endpoint = cleanEndpoint(els.endpoint.value);
+      if (!endpoint) throw new Error("Enter the Modal vLLM endpoint URL.");
+      try {
+        const parsed = new URL(endpoint);
+        if (!["http:", "https:"].includes(parsed.protocol)) {
+          throw new Error();
+        }
+      } catch {
+        throw new Error("The endpoint URL is not valid.");
+      }
+      localStorage.setItem("gemma4Endpoint", endpoint);
+      els.endpoint.value = endpoint;
+      return endpoint;
+    }
+
+    async function fetchWithTimeout(url, options = {}, ms = timeoutMs()) {
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), ms);
+      try {
+        return await fetch(url, { ...options, signal: controller.signal });
+      } catch (error) {
+        if (error.name === "AbortError") {
+          throw new Error(`Request timed out after ${Math.round(ms / 1000)} seconds.`);
+        }
+        if (error instanceof TypeError && String(error.message).includes("fetch")) {
+          throw new Error(
+            "Could not reach the Modal endpoint. Keep start_gemma4_micro_ui.ps1 running, wait until Modal prints the web endpoint, then try again."
+          );
+        }
+        throw error;
+      } finally {
+        window.clearTimeout(timer);
+      }
+    }
+
+    async function waitForHealth(endpoint) {
+      const started = performance.now();
+      const response = await fetchWithTimeout(`${endpoint}/health`, { method: "GET" });
+      const healthMs = performance.now() - started;
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Health check failed with HTTP ${response.status}: ${text}`);
+      }
+      els.healthLatency.textContent = formatMs(healthMs);
+      return healthMs;
+    }
+
+    async function checkHealthOnly() {
+      clearError();
+      try {
+        const endpoint = validateEndpoint();
+        setBusy(true, "Checking");
+        const healthMs = await waitForHealth(endpoint);
+        els.output.textContent = `Health check passed in ${formatMs(healthMs)}.`;
+        setBusy(false);
+      } catch (error) {
+        showError(error.message || String(error));
+      } finally {
+        els.send.disabled = false;
+        els.checkHealth.disabled = false;
+      }
+    }
+
+    async function sendPrompt() {
+      clearError();
+      els.output.textContent = "";
+      const started = performance.now();
+      let healthMs = 0;
+
+      try {
+        const endpoint = validateEndpoint();
+        const prompt = els.prompt.value.trim();
+        if (!prompt) throw new Error("Enter a prompt.");
+
+        setBusy(true, state.hasCompletedRequest ? "Sending" : "Starting");
+        healthMs = await waitForHealth(endpoint);
+
+        const payload = {
+          model: els.model.value.trim() || "google/gemma-4-E4B-it",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: Math.max(1, Number.parseInt(els.maxTokens.value, 10) || 128),
+          temperature: 0,
+          stream: false,
+          chat_template_kwargs: { enable_thinking: false },
+        };
+
+        const requestStarted = performance.now();
+        const response = await fetchWithTimeout(`${endpoint}/v1/chat/completions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const requestMs = performance.now() - requestStarted;
+        const totalMs = performance.now() - started;
+        const text = await response.text();
+
+        if (!response.ok) {
+          throw new Error(`Chat request failed with HTTP ${response.status}: ${text}`);
+        }
+
+        let body;
+        try {
+          body = JSON.parse(text);
+        } catch {
+          throw new Error("The endpoint returned a non-JSON response.");
+        }
+
+        const content = body?.choices?.[0]?.message?.content;
+        if (typeof content !== "string" || !content.trim()) {
+          throw new Error("The response did not include choices[0].message.content.");
+        }
+
+        els.output.textContent = content.trim();
+        const usage = body.usage || {};
+        els.usage.textContent = usage.total_tokens
+          ? `${usage.total_tokens} tokens`
+          : "-";
+
+        const phase = state.hasCompletedRequest ? "Warm" : "First-run";
+        if (state.hasCompletedRequest) {
+          els.warmLatency.textContent = formatMs(totalMs);
+        } else {
+          els.coldLatency.textContent = formatMs(totalMs);
+        }
+
+        state.hasCompletedRequest = true;
+        pushHistory({
+          phase,
+          prompt,
+          totalMs,
+          healthMs,
+          requestMs,
+          tokens: usage.total_tokens || null,
+          at: new Date().toLocaleTimeString(),
+        });
+        setBusy(false);
+      } catch (error) {
+        if (healthMs) {
+          els.healthLatency.textContent = formatMs(healthMs);
+        }
+        showError(error.message || String(error));
+      } finally {
+        els.send.disabled = false;
+        els.checkHealth.disabled = false;
+      }
+    }
+
+    function pushHistory(entry) {
+      state.history.unshift(entry);
+      state.history = state.history.slice(0, 12);
+      localStorage.setItem("gemma4MicroUiHistory", JSON.stringify(state.history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      if (!state.history.length) {
+        els.history.innerHTML = '<div class="empty">No requests yet.</div>';
+        return;
+      }
+      els.history.innerHTML = state.history.map((entry) => `
+        <div class="entry">
+          <div class="entry-head">
+            <span>${entry.phase} · ${entry.at}</span>
+            <span>${formatMs(entry.totalMs)}</span>
+          </div>
+          <strong>${escapeHtml(entry.prompt)}</strong>
+          <div class="entry-head">
+            <span>Health ${formatMs(entry.healthMs)}</span>
+            <span>Request ${formatMs(entry.requestMs)}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
